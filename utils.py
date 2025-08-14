@@ -175,6 +175,7 @@ def test(net, testloader):
     corrects, loss = 0, 0.0
     all_labels = []
     all_preds = []
+    net.to(DEVICE)
     net.eval()
     with torch.no_grad():
         for images, labels in testloader:
