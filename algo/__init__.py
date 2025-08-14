@@ -1,9 +1,3 @@
-# Useful classes 
-from algo.fedavg import FedAvg
-from algo.fedprox import FedProx
-from algo.fedcls import FedCLS
-from algo.moon import MOON
-from algo.fedntd import FedNTD
 
 # Package global imports
 import flwr as fl
@@ -32,3 +26,10 @@ from collections import OrderedDict
 from typing import List, Tuple, Dict, Union, Optional
 from functools import partial, reduce
 from utils import train, get_parameters, set_parameters, test
+
+# Useful classes 
+from algo.fedavg import FedAvg
+from algo.fedprox import FedProx
+from algo.fedcls import FedCLS
+from algo.moon import MOON
+from algo.fedntd import FedNTD

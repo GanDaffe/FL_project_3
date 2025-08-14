@@ -90,16 +90,19 @@ fl.simulation.start_simulation(
     client_fn = client_fn,
     num_clients = NUM_CLIENTS,
     config = fl.server.ServerConfig(num_rounds=NUM_ROUNDS),
-    strategy = FedProx.FedProx(num_rounds=NUM_ROUNDS, 
-                        num_clients=NUM_CLIENTS,
-                        iids = ratio, 
-                        current_parameters=current_parameters, 
-                        learning_rate = lr,
-                        decay_rate=1,
-                        fraction_fit=0.2,
-                        fraction_evaluate=0.02,
-                        proximal_mu = 1
-                        ),
+    strategy = FedProx(
+        num_rounds=NUM_ROUNDS,
+        net=MLP(), 
+        exp_name=algo,
+        testloader=testloaders,
+        num_clients=NUM_CLIENTS,
+        current_parameters=current_parameters, 
+        learning_rate = lr,
+        decay_rate=1,
+        fraction_fit=0.2,
+        fraction_evaluate=0.02,
+        proximal_mu = 1
+        ),
     client_manager=client_manager,
     client_resources = client_resources
 )
