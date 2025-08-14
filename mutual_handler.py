@@ -1,0 +1,25 @@
+
+
+DEFAULT_METRICS = {
+    "loss": None,
+    "accuracy": None,
+    "f1": None,
+    "recall": None,
+    "precision": None,
+    "id": None, 
+    "num_classes": None
+}
+
+
+DEFAULT_CONFIG = {
+    "learning_rate": 0.01,
+    "proximal_mu": 0.1,
+    "epochs": 1,
+    "batch_size": 32,
+    "num_classes": 10,  
+    "device": "cpu", 
+    "tau": 0.0, 
+    "beta": 0.0,
+    "alpha": 0.0
+}
+
