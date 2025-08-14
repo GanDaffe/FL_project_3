@@ -9,7 +9,6 @@ class FedProx(FedAvg):
     ) -> None:
         super().__init__(*args, **kwargs)
         self.proximal_mu = proximal_mu
-        self.result = {"round": [], "train_loss": [], "train_accuracy": [], "test_loss": [], "test_accuracy": []}
 
     def __repr__(self) -> str:
         return "FedProx"
