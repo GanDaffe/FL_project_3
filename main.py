@@ -32,7 +32,7 @@ beta = 0.01
 lr = 0.01
 BATCH_SIZE = 10
 NUM_ROUNDS = 200
-current_parameters = ndarrays_to_parameters(utils.get_parameters(ResNet50()))
+current_parameters = ndarrays_to_parameters(utils.get_parameters(MLP()))
 client_resources = {"num_cpus": 2, "num_gpus": 0.125} if DEVICE.type == "cuda" else {"num_cpus": 1, "num_gpus": 0.0}
 
 trainset, testset = utils.load_data("cifar100")
@@ -76,7 +76,7 @@ class FlowerClient(fl.client.NumPyClient):
 
 def client_fn(context: Context) -> FlowerClient:
     cid = int(context.node_config["partition-id"])
-    net = ResNet50().to(DEVICE)  
+    net = MLP().to(DEVICE)  
     trainloader = trainloaders[int(cid)]  
     valloader = testloaders
     entropy = entropies[int(cid)]

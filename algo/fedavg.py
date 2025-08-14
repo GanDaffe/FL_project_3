@@ -34,7 +34,7 @@ class FedAvg(fl.server.strategy.Strategy):
         self.testloader = testloader
         self.decay_rate = decay_rate
 
-        self.result = {"round": [], "train_loss": [], "train_accuracy": [], "test_loss": [], "test_accuracy": []}
+        self.result = {"round": [], "train_loss": [], "train_accuracy": [], "test_loss": [], "test_accuracy": [], 'test_f1': [], 'test_recall': [], 'test_precision': []}
 
 
     def __repr__(self) -> str: 
@@ -120,12 +120,16 @@ class FedAvg(fl.server.strategy.Strategy):
         test_net = copy.deepcopy(self.net)  
         set_parameters(test_net, parameters_to_ndarrays(parameters))    
         
-        loss, accuracy = test(test_net, self.testloader)
+        loss, accuracy, f1, recall, precision = test(test_net, self.testloader)
 
         if server_round != 0:  
             self.result["test_loss"].append(loss)
             self.result["test_accuracy"].append(accuracy)
-
+            self.result["test_f1"].append(f1)
+            self.result["test_recall"].append(recall)
+            self.result["test_precision"].append(precision)
+            
+            
         print(f"test_loss: {loss} - test_acc: {accuracy}")
 
         if server_round == self.num_rounds:
