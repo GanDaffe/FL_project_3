@@ -65,6 +65,7 @@ class FlowerClient(fl.client.NumPyClient):
         config = {**DEFAULT_CONFIG, **config, **{"entropy": self.entropy}}
         utils.set_parameters(self.net, parameters)
         metrics = fit_handler(algo_name=algo, cid=self.cid, net=self.net, trainloader=self.trainloader, config=config)
+        metrics = {k: v for k, v in metrics.items() if v is not None}
         return utils.get_parameters(self.net), len(self.trainloader.sampler), metrics
 
     def evaluate(self, parameters, config):
