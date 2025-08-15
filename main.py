@@ -6,8 +6,8 @@ import flwr as fl
 from flwr.common import ndarrays_to_parameters
 import utils
 from flwr.common import Context
-from algo import FedAvg, FedProx
-from model import ResNet50, CNN2, MLP
+from algo import FedAvg, FedProx, FedNTD, FedCLS, MOON
+from model import ResNet50, CNN2, MLP, Moon_MLP
 from ClientManager import ClientManager
 from mutual_handler import DEFAULT_CONFIG
 from return_metrics_handler import fit_handler
@@ -94,7 +94,6 @@ fl.simulation.start_simulation(
     strategy = FedProx(
         num_rounds=NUM_ROUNDS,
         net=MLP(), 
-        exp_name=algo,
         testloader=testloaders,
         num_clients=NUM_CLIENTS,
         current_parameters=current_parameters, 

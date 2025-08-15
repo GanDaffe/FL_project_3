@@ -4,7 +4,6 @@ class FedAvg(fl.server.strategy.Strategy):
 
     def __init__(
             self, 
-            exp_name: str,
             net,
             num_rounds: int,
             num_clients: int,
@@ -20,7 +19,6 @@ class FedAvg(fl.server.strategy.Strategy):
         
 
         super().__init__()
-        self.exp_name = exp_name
         self.net = net
         self.num_rounds = num_rounds
         self.num_clients = num_clients
@@ -136,7 +134,7 @@ class FedAvg(fl.server.strategy.Strategy):
             if not os.path.exists('result'): 
                 os.makedirs('result', exist_ok=True)
             df = pd.DataFrame(self.result)
-            df.to_csv(f"result/{self.exp_name}.csv", index=False)
+            df.to_csv(f"result/{self.__repr__()}.csv", index=False)
 
         return float(loss), {"accuracy": accuracy}
 

@@ -5,11 +5,12 @@ import torchvision.models as models
 class MLP(nn.Module):
     def __init__(self) -> None:
         super(MLP, self).__init__()
+        self.relu = nn.ReLU()
         self.flatten = nn.Flatten()
         self.layer1 = nn.Linear(28*28, 200)
         self.layer2 = nn.Linear(200, 200)
         self.layer3 = nn.Linear(200, 10)
-        self.relu = nn.ReLU()
+        
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.flatten(x)
@@ -106,3 +107,20 @@ class ResNet50(nn.Module):
         return self.resnet(x)
     
 
+class Moon_MLP(nn.Module): 
+
+    def __init__(self) -> None:
+        super(Moon_MLP, self).__init__()
+        self.features = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(28*28, 200),
+            nn.ReLU(),
+            nn.Linear(200, 200),
+            nn.ReLU()
+        )
+        self.l3 = nn.Linear(200, 10)
+
+    def forward(self, x):
+        h = self.features(x)
+        y = self.l3(h)
+        return h, h, y
