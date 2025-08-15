@@ -185,6 +185,8 @@ def train_scaffold(
 
     net.train() 
     total_loss, correct, total = 0.0, 0, 0
+    num_batches = 0
+    
     for _ in range(epochs):
         for data, target in trainloader:
             data, target = data.to(device), target.to(device)
