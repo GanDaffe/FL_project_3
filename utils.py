@@ -135,6 +135,8 @@ def train(net, trainloader, learning_rate: float, proximal_mu: float = None, epo
         last_layer = list(net.modules())[-1]
         num_classes = last_layer.out_features
         criterion = NTD_Loss(num_classes=num_classes, tau=tau, beta=beta)
+        global_net = copy.deepcopy(net)
+        global_net.to(DEVICE)
     else: 
         criterion = nn.CrossEntropyLoss()
 
@@ -149,14 +151,17 @@ def train(net, trainloader, learning_rate: float, proximal_mu: float = None, epo
             optimizer.zero_grad()
             outputs = net(images)
             
-            loss = criterion(outputs, labels)
+            if use_ntd_loss:
+                dg_outputs = global_net(images)
+                loss = criterion(outputs, labels, dg_outputs)
+            else: 
+                loss = criterion(outputs, labels)
             if proximal_mu is not None:
                 prox_term = 0.0
                 for local_w, global_w in zip(net.parameters(), global_params):
                     prox_term += torch.square((local_w - global_w).norm(2))
 
                 loss = loss + (proximal_mu / 2) * prox_term
-
             
             loss.backward()
             optimizer.step()
