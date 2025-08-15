@@ -81,7 +81,7 @@ def client_fn(context: Context) -> FlowerClient:
     trainloader = trainloaders[int(cid)]  
     valloader = testloaders
     entropy = entropies[int(cid)]
-    return FlowerClient(cid, net, trainloader, valloader, 0).to_client()
+    return FlowerClient(cid, net, trainloader, valloader, entropy).to_client()
 
 
 # Training
