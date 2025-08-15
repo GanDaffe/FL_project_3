@@ -34,7 +34,7 @@ class Scaffold(FedAvg):
                 self.client_controls[cid] = [np.zeros_like(w) for w in weights]
             client_control = self.client_controls[cid]
             # Combine parameters: [model_weights, server_control, client_control]
-            combined_weights = weights + self.server_control + client_control
+            combined_weights = weights + self.server_controls + client_control
             parameters_with_control = ndarrays_to_parameters(combined_weights)
             # Create FitIns with combined parameters
             fit_ins = FitIns(parameters=parameters_with_control, config={"learning_rate": self.learning_rate})
@@ -55,8 +55,8 @@ class Scaffold(FedAvg):
         total_examples = sum(fit_res.num_examples for _, fit_res in results)
 
         # Prepare accumulators
-        sum_model_params = [np.zeros_like(c) for c in self.server_control]
-        sum_control_updates = [np.zeros_like(c) for c in self.server_control]
+        sum_model_params = [np.zeros_like(c) for c in self.server_controls]
+        sum_control_updates = [np.zeros_like(c) for c in self.server_controls]
 
         # Iterate over client results
         for client, fit_res in results:
@@ -92,8 +92,8 @@ class Scaffold(FedAvg):
         # Update server control variate
         total_clients = len(self.client_controls)
         cv_multiplier = len(results) / total_clients if total_clients > 0 else 1.0
-        for idx in range(len(self.server_control)):
-            self.server_control[idx] += cv_multiplier * avg_control_update[idx]
+        for idx in range(len(self.server_controls)):
+            self.server_controls[idx] += cv_multiplier * avg_control_update[idx]
 
         losses = [fit_res.num_examples * fit_res.metrics["loss"] for _, fit_res in results]
         corrects = [round(fit_res.num_examples * fit_res.metrics["accuracy"]) for _, fit_res in results]
