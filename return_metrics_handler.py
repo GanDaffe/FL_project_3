@@ -10,7 +10,7 @@ from support_function_and_class_for_FL import train_moon, train_scaffold
 
 MOON_SAVE_DIR = '/moon_save_point/'
 
-def fit_handler(algo_name, cid, config, net, trainloader, client_control=None):
+def fit_handler(algo_name, cid, config, net, trainloader, client_control=None, parameters=None):
     """
     Handler function to return the metrics based on the algorithm name.
     
@@ -21,6 +21,7 @@ def fit_handler(algo_name, cid, config, net, trainloader, client_control=None):
         trainloader (DataLoader): DataLoader for the training dataset.
         config (dict): Configuration parameters for the algorithm.
         client_control (list, optional): Client control variates for Scaffold algorithm. Defaults to None.
+        parameters (Parameters, optional): Model parameters. Defaults to None.
     Returns:
         dict: A dictionary containing the metrics such as loss, accuracy, and necessary metrics for some algorithm.
     """
@@ -69,7 +70,7 @@ def fit_handler(algo_name, cid, config, net, trainloader, client_control=None):
             "accuracy": acc
         }
     elif algo_name == "scaffold":
-        full_params = parameters_to_ndarrays(get_parameters(net))
+        full_params = parameters_to_ndarrays(parameters)
         num_model_params = len(full_params) // 3 
         model_weights = full_params[:num_model_params]
         server_control = full_params[num_model_params:2*num_model_params]
