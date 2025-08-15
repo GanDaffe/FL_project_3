@@ -20,6 +20,7 @@ DEFAULT_CONFIG = {
     "device": "cpu", 
     "tau": 0.0, 
     "beta": 0.0,
-    "alpha": 0.0
+    "alpha": 0.0, 
+    "entropy": 0.0,
 }
 

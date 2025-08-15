@@ -25,12 +25,12 @@ def fit_handler(algo_name, cid, config, net, trainloader):
     elif algo_name == "fedavg":
         res_metrics = train(net, trainloader, learning_rate=config["learning_rate"], epochs=config["epochs"])
     elif algo_name == "fedntd":
-        res_metrics = train(net, trainloader, learning_rate=config["learning_rate"], epochs=config["epochs"], use_ntd_loss=True)
+        res_metrics = train(net, trainloader, learning_rate=config["learning_rate"], epochs=config["epochs"], use_ntd_loss=True, tau=config["tau"], beta=config["beta"])
     elif algo_name == "fedcls": 
         last_layer = list(net.modules())[-1]
         num_classes = last_layer.out_features
         num_classes_metrics = {'num_classes': num_classes} 
-        res_metrics = train(net, trainloader, learning_rate=config["learning_rate"], epochs=config["epochs"], use_ntd_loss=True, tau=config["tau"], beta=config["beta"])
+        res_metrics = train(net, trainloader, learning_rate=config["learning_rate"], epochs=config["epochs"])
         res_metrics.update(num_classes_metrics)
     elif algo_name == "moon": 
         save_dir = os.path.join(MOON_SAVE_DIR, f"client_{cid}")
