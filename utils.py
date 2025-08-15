@@ -11,7 +11,7 @@ import torchvision.transforms as transforms
 import torch.nn as nn
 from torch.optim import SGD
 from sklearn.metrics import f1_score, recall_score, precision_score
-
+from model import Moon_MLP
 from support_function_and_class_for_FL import NTD_Loss
 
 seed_value = 42
@@ -185,8 +185,16 @@ def test(net, testloader):
     with torch.no_grad():
         for images, labels in testloader:
             images, labels = images.to(DEVICE), labels.to(DEVICE)
-            outputs = net(images).to(DEVICE)
-            predicted = torch.argmax(outputs, dim=1)
+            if isinstance(net, Moon_MLP): 
+                _, _, outputs = net(images)
+            else:
+                outputs = net(images)
+            outputs = outputs.to(DEVICE)
+            if isinstance(net, Moon_MLP):
+                _, predicted = torch.max(outputs.data, 1)
+            else:  
+                predicted = torch.argmax(outputs, dim=1)
+
             loss += criterion(outputs, labels).item() * images.shape[0]
             corrects += torch.sum(predicted == labels).item()
             all_labels.extend(labels.cpu().numpy())
