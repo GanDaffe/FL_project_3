@@ -7,9 +7,9 @@ class Scaffold(FedAvg):
         **kwargs
     ) -> None:
         super().__init__(*args, **kwargs)
-        self.server_controls = List[np.ndarray] = []
-        self.client_controls = List[np.ndarray] = []
-        self.num_models_param = None
+        self.server_controls  = []
+        self.client_controls  = []
+        self.num_model_params = None
 
     def __repr__(self) -> str:
         return "Scaffold"
@@ -17,7 +17,6 @@ class Scaffold(FedAvg):
     def configure_fit(
         self, server_round: int, parameters: Parameters, client_manager: ClientManager
     ) -> List[Tuple[ClientProxy, FitIns]]:
-        """Configure the next round of training."""
         sample_size, min_num_clients = self.num_fit_clients(client_manager.num_available())
         clients = client_manager.sample(num_clients=sample_size, min_num_clients=min_num_clients)
         
@@ -49,7 +48,6 @@ class Scaffold(FedAvg):
         results: List[Tuple[ClientProxy, FitRes]],
         failures: List[Tuple[ClientProxy, FitRes]],
     ) -> Tuple[Optional[Parameters], Dict[str, Scalar]]:
-        """Aggregate training results and update global model and control variates."""
         if not results:
             return None, {}
 
@@ -62,7 +60,7 @@ class Scaffold(FedAvg):
 
         # Iterate over client results
         for client, fit_res in results:
-            cid = client.cid
+            cid = fit_res.metrics['id']
             res_weights = parameters_to_ndarrays(fit_res.parameters)
             
             # Split parameters

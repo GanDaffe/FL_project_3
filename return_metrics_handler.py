@@ -90,5 +90,5 @@ def fit_handler(algo_name, cid, config, net, trainloader, client_control=None, p
             client_control=client_control
         )
 
-    return {**DEFAULT_METRICS, **res_metrics, **{"id": cid}}
+    return {**DEFAULT_METRICS, **res_metrics, **{"id": int(cid)}}
 
