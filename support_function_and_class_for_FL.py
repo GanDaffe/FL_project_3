@@ -1,7 +1,6 @@
 import torch.nn.functional as F
 from torch import nn
 import torch
-from utils import get_parameters
 # ====== FedNTD ======
 def refine_as_not_true(logits, targets, num_classes):
     nt_positions = torch.arange(0, num_classes).to(logits.device)
@@ -173,6 +172,8 @@ def train_scaffold(
     server_control,
     client_control
 ):
+    from utils import get_parameters
+
     correction_tensors = [
             torch.tensor(c_i - c_s, dtype=torch.float32, device=device)
             for c_i, c_s in zip(client_control_old, server_control)
