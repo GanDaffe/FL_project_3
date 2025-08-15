@@ -65,7 +65,7 @@ class FlowerClient(fl.client.NumPyClient):
     def fit(self, parameters, config):
         config = {**DEFAULT_CONFIG, **config, **{"entropy": self.entropy}}
         utils.set_parameters(self.net, parameters)
-        metrics = fit_handler(algo_name=algo, cid=self.cid, net=self.net, trainloader=self.trainloader, config=config, client_control=self.client_control)
+        metrics = fit_handler(algo_name=algo, cid=self.cid, net=self.net, trainloader=self.trainloader, config=config, client_control=self.client_control, parameters=parameters)
         
         if algo == "scaffold":
             self.client_control = metrics["client_control"]
