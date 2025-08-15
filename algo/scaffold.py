@@ -34,7 +34,7 @@ class Scaffold(FedAvg):
                 self.client_controls[cid] = [np.zeros_like(w) for w in weights]
             client_control = self.client_controls[cid]
             # Combine parameters: [model_weights, server_control, client_control]
-            combined_weights = weights + self.server_controls + client_control
+            combined_weights = [*weights, *self.server_controls, *client_control]
             parameters_with_control = ndarrays_to_parameters(combined_weights)
             # Create FitIns with combined parameters
             fit_ins = FitIns(parameters=parameters_with_control, config={"learning_rate": self.learning_rate})

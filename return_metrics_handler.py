@@ -3,7 +3,7 @@ import os
 import copy
 import torch
 import numpy as np
-from flwr.common import parameters_to_ndarrays
+from flwr.common import parameters_to_ndarrays, ndarrays_to_parameters
 
 from utils import train, get_parameters
 from support_function_and_class_for_FL import train_moon, train_scaffold
@@ -70,6 +70,9 @@ def fit_handler(algo_name, cid, config, net, trainloader, client_control=None, p
             "accuracy": acc
         }
     elif algo_name == "scaffold":
+        if isinstance(parameters, list):
+            print("⚠ Received list instead of Parameters, converting...")
+            parameters = ndarrays_to_parameters(parameters)
         full_params = parameters_to_ndarrays(parameters)
         num_model_params = len(full_params) // 3 
         model_weights = full_params[:num_model_params]
