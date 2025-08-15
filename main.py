@@ -6,7 +6,7 @@ import flwr as fl
 from flwr.common import ndarrays_to_parameters
 import utils
 from flwr.common import Context
-from algo import FedAvg, FedProx, FedNTD, FedCLS, MOON
+from algo import FedAvg, FedProx, FedNTD, FedCLS, MOON, Scaffold
 from model import ResNet50, CNN2, MLP, Moon_MLP
 from ClientManager import ClientManager
 from mutual_handler import DEFAULT_CONFIG
@@ -57,6 +57,7 @@ class FlowerClient(fl.client.NumPyClient):
         self.trainloader = trainloader
         self.valloader = valloader
         self.entropy = 1 - entropy
+        self.client_control = None # Scaffold only 
 
     def get_parameters(self, config):
         return utils.get_parameters(self.net)
@@ -64,7 +65,11 @@ class FlowerClient(fl.client.NumPyClient):
     def fit(self, parameters, config):
         config = {**DEFAULT_CONFIG, **config, **{"entropy": self.entropy}}
         utils.set_parameters(self.net, parameters)
-        metrics = fit_handler(algo_name=algo, cid=self.cid, net=self.net, trainloader=self.trainloader, config=config)
+        metrics = fit_handler(algo_name=algo, cid=self.cid, net=self.net, trainloader=self.trainloader, config=config, client_control=self.client_control)
+        
+        if algo == "scaffold":
+            self.client_control = metrics["client_control"]
+            
         metrics = {k: v for k, v in metrics.items() if v is not None}
         return utils.get_parameters(self.net), len(self.trainloader.sampler), metrics
 

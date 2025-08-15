@@ -2,23 +2,27 @@ from mutual_handler import DEFAULT_METRICS
 import os
 import copy
 import torch
+import numpy as np
+from flwr.common import parameters_to_ndarrays
 
-from utils import train
-from support_function_and_class_for_FL import train_moon
+from utils import train, get_parameters
+from support_function_and_class_for_FL import train_moon, train_scaffold
 
 MOON_SAVE_DIR = '/moon_save_point/'
 
-def fit_handler(algo_name, cid, config, net, trainloader):
+def fit_handler(algo_name, cid, config, net, trainloader, client_control=None):
     """
     Handler function to return the metrics based on the algorithm name.
     
     Args:
         algo_name (str): Name of the algorithm.
+        cid (str): Client ID.
+        net (torch.nn.Module): The neural network model to be trained.
+        trainloader (DataLoader): DataLoader for the training dataset.
         config (dict): Configuration parameters for the algorithm.
-        metrics (dict): Metrics to be returned.
-    
+        client_control (list, optional): Client control variates for Scaffold algorithm. Defaults to None.
     Returns:
-        dict: A dictionary containing the algorithm name, configuration, and metrics.
+        dict: A dictionary containing the metrics such as loss, accuracy, and necessary metrics for some algorithm.
     """
     if algo_name == "fedprox":
         res_metrics = train(net, trainloader, learning_rate=config["learning_rate"], epochs=config["epochs"], proximal_mu=config['proximal_mu'] * config["entropy"])
@@ -64,5 +68,26 @@ def fit_handler(algo_name, cid, config, net, trainloader):
             "loss": loss,
             "accuracy": acc
         }
+    elif algo_name == "scaffold":
+        full_params = parameters_to_ndarrays(get_parameters(net))
+        num_model_params = len(full_params) // 3 
+        model_weights = full_params[:num_model_params]
+        server_control = full_params[num_model_params:2*num_model_params]
+        client_control_old = full_params[2*num_model_params:]
+        
+        if client_control is None:
+            client_control = [np.zeros_like(w) for w in model_weights]
+
+        res_metrics = train_scaffold(
+            net,
+            trainloader,
+            learning_rate=config["learning_rate"],
+            epochs=config["epochs"],
+            device=config["device"],
+            client_control_old=client_control_old,
+            server_control=server_control,
+            client_control=client_control
+        )
+
     return {**DEFAULT_METRICS, **res_metrics, **{"id": cid}}
 

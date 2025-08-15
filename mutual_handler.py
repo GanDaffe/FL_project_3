@@ -1,4 +1,5 @@
-
+import torch
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 DEFAULT_METRICS = {
     "loss": None,
@@ -7,7 +8,8 @@ DEFAULT_METRICS = {
     "recall": None,
     "precision": None,
     "id": None, 
-    "num_classes": None
+    "num_classes": None, 
+    "client_control": None
 }
 
 
@@ -16,7 +18,7 @@ DEFAULT_CONFIG = {
     "proximal_mu": 0.1,
     "epochs": 1,
     "num_classes": 10,  
-    "device": "cpu", 
+    "device": DEVICE, 
     "tau": 0.0, 
     "beta": 0.0,
     "alpha": 0.0, 

@@ -1,7 +1,7 @@
 import torch.nn.functional as F
 from torch import nn
 import torch
-
+from utils import get_parameters
 # ====== FedNTD ======
 def refine_as_not_true(logits, targets, num_classes):
     nt_positions = torch.arange(0, num_classes).to(logits.device)
@@ -160,3 +160,72 @@ def train_moon(
     print(f">> Training accuracy: {train_acc:.6f}")
     print(" ** Training complete **")
     return net, epoch_loss, train_acc
+
+# ===== Scaffold ======
+
+def train_scaffold(
+    net,
+    trainloader,
+    learning_rate,
+    epochs,
+    device, 
+    client_control_old,
+    server_control,
+    client_control
+):
+    correction_tensors = [
+            torch.tensor(c_i - c_s, dtype=torch.float32, device=device)
+            for c_i, c_s in zip(client_control_old, server_control)
+        ]
+    initial_weights = get_parameters(net)
+
+    criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.SGD(net.parameters(), lr=learning_rate)
+
+    net.train() 
+    
+    for _ in range(epochs):
+        for data, target in trainloader:
+            data, target = data.to(device), target.to(device)
+            optimizer.zero_grad()
+            output = net(data)
+            loss = criterion(output, target)
+            loss.backward()
+            
+            with torch.no_grad():
+                for param, corr in zip(net.parameters(), correction_tensors):
+                    if param.grad is not None:
+                        param.grad -= corr
+            
+            optimizer.step()
+            
+            # Update metrics
+            total_loss += loss.item()
+            pred = output.argmax(dim=1, keepdim=True)
+            correct += pred.eq(target.view_as(pred)).sum().item()
+            total += target.size(0)
+            num_batches += 1
+
+        # Compute updated weights (wT)
+        updated_weights = get_parameters(net)
+
+        
+        # Calculate control update: Δc_i = -c_s + (w0 - wT)/(Kη)
+        K = num_batches  # Number of local steps
+        eta = 0.01  # Learning rate
+        control_update = [
+            (w0 - wT) / (K * eta) - c_s
+            for w0, wT, c_s in zip(initial_weights, updated_weights, server_control)
+        ]
+        
+        # Update client control: c_i^{new} = c_i^{old} + Δc_i
+        client_control = [
+            c_old + delta 
+            for c_old, delta in zip(client_control_old, control_update)
+        ]
+    
+    return {
+        'loss': total_loss / num_batches,
+        'accuracy': correct / total,
+        'client_control': client_control
+        }
