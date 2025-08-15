@@ -184,7 +184,7 @@ def train_scaffold(
     optimizer = torch.optim.SGD(net.parameters(), lr=learning_rate)
 
     net.train() 
-    
+    total_loss, correct, total = 0.0, 0, 0
     for _ in range(epochs):
         for data, target in trainloader:
             data, target = data.to(device), target.to(device)
