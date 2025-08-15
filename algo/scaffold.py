@@ -30,7 +30,7 @@ class Scaffold(FedAvg):
         instructions = []
         for client in clients:
             cid = int(client.cid)
-            if cid not in self.client_controls:
+            if cid not in self.client_controls.keys():
                 self.client_controls[cid] = [np.zeros_like(w) for w in weights]
             client_control = self.client_controls[cid]
             # Combine parameters: [model_weights, server_control, client_control]
@@ -95,7 +95,16 @@ class Scaffold(FedAvg):
         for idx in range(len(self.server_control)):
             self.server_control[idx] += cv_multiplier * avg_control_update[idx]
 
+        losses = [fit_res.num_examples * fit_res.metrics["loss"] for _, fit_res in results]
+        corrects = [round(fit_res.num_examples * fit_res.metrics["accuracy"]) for _, fit_res in results]
         # Create Parameters object
+        loss = sum(losses) / total_examples
+        accuracy = sum(corrects) / total_examples
+
         self.current_parameters = ndarrays_to_parameters(new_global_weights)
+        self.result["round"].append(server_round)
+        self.result["train_loss"].append(loss)
+        self.result["train_accuracy"].append(accuracy)
+        print(f"train_loss: {loss} - train_acc: {accuracy}")
 
         return self.current_parameters, {}

@@ -173,7 +173,7 @@ def train_scaffold(
     client_control
 ):
     from utils import get_parameters
- 
+    from flwr import ndarrays_to_parameters
     correction_tensors = [
             torch.tensor(c_i - c_s, dtype=torch.float32, device=device)
             for c_i, c_s in zip(client_control_old, server_control)
@@ -213,7 +213,7 @@ def train_scaffold(
         
         # Calculate control update: Δc_i = -c_s + (w0 - wT)/(Kη)
         K = num_batches  # Number of local steps
-        eta = 0.01  # Learning rate
+        eta = learning_rate  # Learning rate
         control_update = [
             (w0 - wT) / (K * eta) - c_s
             for w0, wT, c_s in zip(initial_weights, updated_weights, server_control)
@@ -228,5 +228,8 @@ def train_scaffold(
     return {
         'loss': total_loss / num_batches,
         'accuracy': correct / total,
+        'params': ndarrays_to_parameters(
+                updated_weights + server_control + control_update
+            ),
         'client_control': client_control
         }

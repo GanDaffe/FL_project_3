@@ -69,9 +69,11 @@ class FlowerClient(fl.client.NumPyClient):
         
         if algo == "scaffold":
             self.client_control = metrics["client_control"]
-            
+            client_params_news = metrics['params']
+        else:
+            client_params_news = utils.get_parameters(self.net)
         metrics = {k: v for k, v in metrics.items() if v is not None}
-        return utils.get_parameters(self.net), len(self.trainloader.sampler), metrics
+        return client_params_news, len(self.trainloader.sampler), metrics
 
     def evaluate(self, parameters, config):
         config = {**DEFAULT_CONFIG, **config}
