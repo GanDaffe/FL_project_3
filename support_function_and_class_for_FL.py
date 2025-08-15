@@ -173,7 +173,7 @@ def train_scaffold(
     client_control
 ):
     from utils import get_parameters
-    from flwr import ndarrays_to_parameters
+    from flwr.common import ndarrays_to_parameters
     correction_tensors = [
             torch.tensor(c_i - c_s, dtype=torch.float32, device=device)
             for c_i, c_s in zip(client_control_old, server_control)
