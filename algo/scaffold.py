@@ -7,8 +7,8 @@ class Scaffold(FedAvg):
         **kwargs
     ) -> None:
         super().__init__(*args, **kwargs)
-        self.server_controls  = []
-        self.client_controls  = []
+        self.server_controls  = {}
+        self.client_controls  = {}
         self.num_model_params = None
 
     def __repr__(self) -> str:
