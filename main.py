@@ -3,7 +3,7 @@ from torch.utils.data import DataLoader, random_split, SubsetRandomSampler
 import numpy as np
 import random
 import flwr as fl
-from flwr.common import ndarrays_to_parameters
+from flwr.common import ndarrays_to_parameters, parameters_to_ndarrays
 import utils
 from flwr.common import Context
 from algo import FedAvg, FedProx, FedNTD, FedCLS, MOON, Scaffold
@@ -35,7 +35,7 @@ NUM_ROUNDS = 200
 current_parameters = ndarrays_to_parameters(utils.get_parameters(MLP()))
 client_resources = {"num_cpus": 2, "num_gpus": 0.125} if DEVICE.type == "cuda" else {"num_cpus": 1, "num_gpus": 0.0}
 
-trainset, testset = utils.load_data("cifar100")
+trainset, testset = utils.load_data("fmnist")
 ids, dist = utils.partition_data(trainset, num_clients=NUM_CLIENTS, ratio=ratio, alpha=alpha, beta=beta)
 
 #ids, dist = utils.partition_data_sharding(trainset, num_clients=NUM_CLIENTS)
@@ -69,7 +69,9 @@ class FlowerClient(fl.client.NumPyClient):
         
         if algo == "scaffold":
             self.client_control = metrics["client_control"]
-            client_params_news = metrics['params']
+            params_obj = metrics['params']
+            client_params_news = parameters_to_ndarrays(params_obj)
+            _, _ = metrics.pop("params", None), metrics.pop("client_control", None)
         else:
             client_params_news = utils.get_parameters(self.net)
         metrics = {k: v for k, v in metrics.items() if v is not None}
