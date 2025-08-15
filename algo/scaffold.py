@@ -29,7 +29,7 @@ class Scaffold(FedAvg):
 
         instructions = []
         for client in clients:
-            cid = client.cid
+            cid = int(client.cid)
             if cid not in self.client_controls:
                 self.client_controls[cid] = [np.zeros_like(w) for w in weights]
             client_control = self.client_controls[cid]
