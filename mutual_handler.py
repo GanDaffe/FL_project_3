@@ -15,7 +15,6 @@ DEFAULT_CONFIG = {
     "learning_rate": 0.01,
     "proximal_mu": 0.1,
     "epochs": 1,
-    "batch_size": 32,
     "num_classes": 10,  
     "device": "cpu", 
     "tau": 0.0, 

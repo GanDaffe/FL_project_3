@@ -102,6 +102,7 @@ fl.simulation.start_simulation(
         fraction_fit=0.2,
         fraction_evaluate=0.02,
         proximal_mu = 1
+       # all_classes = len(dist[0])
         ),
     client_manager=client_manager,
     client_resources = client_resources

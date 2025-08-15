@@ -70,6 +70,12 @@ def compute_accuracy(model, dataloader, device="cpu"):
             correct += (pred_label == target.data).sum().item()
 
         avg_loss = sum(loss_collector) / len(loss_collector)
+   
+
+    if was_training:
+        model.train()
+
+    return correct / float(total), avg_loss
 
 def train_moon(
     net,
