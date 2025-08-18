@@ -23,6 +23,15 @@ if torch.cuda.is_available():
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+def kl_divergence(p, q):
+    p = np.array(p)
+    q = np.array(q)
+
+    mask = (p != 0) & (q != 0)
+    p = p[mask]
+    q = q[mask]
+
+    return np.sum(p * np.log(p / q))
 
 def renormalize(dist: torch.tensor, labels: List[int], label: int):
     idx = labels.index(label)

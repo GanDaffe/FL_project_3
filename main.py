@@ -96,6 +96,16 @@ def client_fn(context: Context) -> FlowerClient:
 # Training
 client_manager = ClientManager()
 
+if algo == 'feddisco': 
+    dk = {}
+    num_classes = len(dist[0]) 
+
+    uniform_distribution = [1 / num_classes] * num_classes
+    for i in range(NUM_CLIENTS):
+        total = sum(dist[i].values())
+        client_distribution = [count / total for count in dist[i].values()]
+        dk[i] = utils.kl_divergence(client_distribution, uniform_distribution)
+    
 fl.simulation.start_simulation(
     client_fn = client_fn,
     num_clients = NUM_CLIENTS,
@@ -112,6 +122,7 @@ fl.simulation.start_simulation(
         fraction_evaluate=0.02,
         proximal_mu = 1
        # all_classes = len(dist[0])
+       # dk=dk
         ),
     client_manager=client_manager,
     client_resources = client_resources

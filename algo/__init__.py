@@ -34,3 +34,4 @@ from algo.fedcls import FedCLS
 from algo.moon import MOON
 from algo.fedntd import FedNTD
 from algo.scaffold import Scaffold
+from algo.feddisco import FedDisco
