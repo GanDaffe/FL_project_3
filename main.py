@@ -58,6 +58,7 @@ class FlowerClient(fl.client.NumPyClient):
         self.valloader = valloader
         self.entropy = 1 - entropy
         self.client_control = None # Scaffold only 
+        self.num_classes = sum(v is not None and v > 0 for v in dist[cid].values())
 
     def get_parameters(self, config):
         return utils.get_parameters(self.net)
@@ -74,6 +75,10 @@ class FlowerClient(fl.client.NumPyClient):
             _, _ = metrics.pop("params", None), metrics.pop("client_control", None)
         else:
             client_params_news = utils.get_parameters(self.net)
+            
+        if algo == "fedcls":
+            metrics["num_classes"] = self.num_classes
+
         metrics = {k: v for k, v in metrics.items() if v is not None}
         return client_params_news, len(self.trainloader.sampler), metrics
 
