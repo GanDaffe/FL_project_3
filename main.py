@@ -6,7 +6,7 @@ import flwr as fl
 from flwr.common import ndarrays_to_parameters, parameters_to_ndarrays
 import utils
 from flwr.common import Context
-from algo import FedAvg, FedProx, FedNTD, FedCLS, MOON, Scaffold
+from algo import FedAvg, FedProx, FedNTD, FedCLS, MOON, Scaffold, FedDisco
 from model import ResNet50, CNN2, MLP, Moon_MLP
 from ClientManager import ClientManager
 from mutual_handler import DEFAULT_CONFIG
@@ -24,7 +24,7 @@ print(f"Training on {DEVICE} using PyTorch {torch.__version__} and Flower {fl.__
 
 # Loading the data
 
-algo = "fedprox" 
+algo = "feddisco" 
 NUM_CLIENTS = 40
 ratio = 0.2
 alpha = 100
@@ -99,18 +99,19 @@ client_manager = ClientManager()
 if algo == 'feddisco': 
     dk = {}
     num_classes = len(dist[0]) 
-
+    
     uniform_distribution = [1 / num_classes] * num_classes
     for i in range(NUM_CLIENTS):
-        total = sum(dist[i].values())
-        client_distribution = [count / total for count in dist[i].values()]
+        dist_i = [val if val is not None else 0 for val in dist[i].values()] 
+        total = sum(dist_i)
+        client_distribution = [count / total for count in dist_i]
         dk[i] = utils.kl_divergence(client_distribution, uniform_distribution)
     
 fl.simulation.start_simulation(
     client_fn = client_fn,
     num_clients = NUM_CLIENTS,
     config = fl.server.ServerConfig(num_rounds=NUM_ROUNDS),
-    strategy = FedProx(
+    strategy = FedDisco(
         num_rounds=NUM_ROUNDS,
         net=MLP(), 
         testloader=testloaders,
@@ -120,9 +121,9 @@ fl.simulation.start_simulation(
         decay_rate=1,
         fraction_fit=0.2,
         fraction_evaluate=0.02,
-        proximal_mu = 1
+       # proximal_mu = 1,
        # all_classes = len(dist[0])
-       # dk=dk
+        dk=dk
         ),
     client_manager=client_manager,
     client_resources = client_resources
